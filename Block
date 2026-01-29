@@ -1,0 +1,79 @@
+import pygame
+import sys
+
+# ตั้งค่าสีและขนาด
+WHITE = (255, 255, 255)
+BLACK = (30, 30, 30)
+GRAY = (200, 200, 200)
+BLUE = (50, 150, 255)
+RED = (255, 100, 100)
+
+WIDTH, HEIGHT = 500, 700
+GRID_SIZE = 8
+CELL_SIZE = 40
+OFFSET_X = (WIDTH - (GRID_SIZE * CELL_SIZE)) // 2
+OFFSET_Y = 100
+
+class BlockGame:
+    def __init__(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        pygame.display.set_caption("Gemini Block Blast")
+        self.clock = pygame.time.Clock()
+        
+        # สร้างตารางว่าง (0 = ว่าง, 1 = มีบล็อก)
+        self.grid = [[0 for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
+        
+        # ตัวอย่างบล็อกตัว L (3x2)
+        self.current_block = [[1, 0], [1, 0], [1, 1]]
+        self.block_pos = [200, 500]
+        self.dragging = False
+
+    def draw_grid(self):
+        for row in range(GRID_SIZE):
+            for col in range(GRID_SIZE):
+                rect = pygame.Rect(OFFSET_X + col * CELL_SIZE, OFFSET_Y + row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+                pygame.draw.rect(self.screen, GRAY, rect, 1)
+                if self.grid[row][col] == 1:
+                    pygame.draw.rect(self.screen, BLUE, rect.inflate(-2, -2))
+
+    def draw_block(self):
+        for r, row in enumerate(self.current_block):
+            for c, val in enumerate(row):
+                if val:
+                    rect = pygame.Rect(self.block_pos[0] + c * CELL_SIZE, 
+                                     self.block_pos[1] + r * CELL_SIZE, 
+                                     CELL_SIZE, CELL_SIZE)
+                    pygame.draw.rect(self.screen, RED, rect)
+
+    def run(self):
+        while True:
+            self.screen.fill(WHITE)
+            self.draw_grid()
+            self.draw_block()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                
+                # ระบบลากวาง (Basic Drag & Drop)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if pygame.Rect(self.block_pos[0], self.block_pos[1], 80, 120).collidepoint(event.pos):
+                        self.dragging = True
+                
+                if event.type == pygame.MOUSEBUTTONUP:
+                    self.dragging = False
+                    # ตรวจสอบการวางลงตาราง (Logic การวางบล็อกต้องเพิ่มตรงนี้)
+                    self.block_pos = [200, 500] # ดีดกลับที่เดิมก่อน
+
+                if event.type == pygame.MOUSEMOTION and self.dragging:
+                    self.block_pos[0] += event.rel[0]
+                    self.block_pos[1] += event.rel[1]
+
+            pygame.display.flip()
+            self.clock.tick(60)
+
+if __name__ == "__main__":
+    game = BlockGame()
+    game.run()
