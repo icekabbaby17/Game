@@ -1,57 +1,289 @@
-import time
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เชฟกระทะเหล็ก: ครัวไทยอีโมจิ 🇹🇭👨‍🍳</title>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #FFF3E0;
+            color: #5D4037;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-# คลังข้อมูลเมนู (คุณสามารถเปลี่ยนชื่อเมนูและวัตถุดิบได้ตามใจชอบให้ครบ 13 อย่าง)
-recipes = {
-    "1": {"name": "ข้าวผัดไข่", "ingre": "ข้าวสวย, ไข่, ซอสปรุงรส"},
-    "2": {"name": "กะเพราไก่", "ingre": "ไก่, ใบกะเพรา, พริก"},
-    "3": {"name": "ต้มยำกุ้ง", "ingre": "กุ้ง, ตะไคร้, มะนาว"},
-    "4": {"name": "ผัดไทย", "ingre": "เส้นเล็ก, กุ้ง, ถั่วฝักยาว"},
-    "5": {"name": "ส้มตำ", "ingre": "มะละกอ, ปลาร้า, พริกขี้หนู"},
-    "6": {"name": "แกงเขียวหวาน", "ingre": "กะทิ, เนื้อไก่, มะเขือเปราะ"},
-    "7": {"name": "ไข่เจียวสมุนไพร", "ingre": "ไข่, หอมแดง, โหระพา"},
-    "8": {"name": "ราดหน้าหมูหมัก", "ingre": "เส้นใหญ่, คัดเค้า, เนื้อหมู"},
-    "9": {"name": "ต้มจืดเต้าหู้", "ingre": "เต้าหู้หลอด, ผักกาดขาว, หมูสับ"},
-    "10": {"name": "หมูทอดกระเทียม", "ingre": "เนื้อหมู, กระเทียม, พริกไทย"},
-    "11": {"name": "ยำวุ้นเส้น", "ingre": "วุ้นเส้น, หมูสับ, น้ำยำ"},
-    "12": {"name": "สเต็กไก่", "ingre": "อกไก่, เกลือ, พริกไทยดำ"},
-    "13": {"name": "ข้าวต้มปลา", "ingre": "ข้าว, เนื้อปลา, ขิง"},
-}
+        h1 { font-size: 2.5em; margin-bottom: 10px; color: #E65100; }
+        
+        .game-container {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+        }
 
-def start_game():
-    print("--- ยินดีต้อนรับสู่ห้องครัวจำลอง! ---")
-    print("วันนี้คุณมีเมนูให้เลือกทำถึง 13 อย่าง:")
-    
-    # แสดงรายการเมนูทั้งหมด
-    for key, menu in recipes.items():
-        print(f"{key}. {menu['name']}")
+        /* Menu Selection */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
 
-    choice = input("\nกรุณาเลือกหมายเลขเมนูที่ต้องการทำ (1-13): ")
+        .menu-btn {
+            background: #FFCC80;
+            border: none;
+            padding: 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: transform 0.2s;
+        }
+        .menu-btn:hover { transform: scale(1.05); background: #FFB74D; }
 
-    if choice in recipes:
-        cook(recipes[choice])
-    else:
-        print("ขออภัย เราไม่มีเมนูนั้นในวันนี้ ลองเลือกใหม่อีกครั้งนะ!")
-        start_game()
+        /* Cooking Station */
+        #kitchen { display: none; }
+        
+        .pot-area {
+            background: #f0f0f0;
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            border: 5px solid #E65100;
+            position: relative;
+        }
 
-def cook(menu):
-    print(f"\nเริ่มทำเมนู: {menu['name']}!")
-    print(f"เตรียมวัตถุดิบ: {menu['ingre']}...")
-    
-    # จำลองการทำอาหาร
-    steps = ["กำลังหั่นวัตถุดิบ...", "ตั้งกระทะให้ร้อน...", "ใส่ส่วนผสมลงไป...", "ปรุงรสชาติให้กลมกล่อม..."]
-    
-    for step in steps:
-        time.sleep(1.5) # หน่วงเวลาเพื่อให้ดูเหมือนกำลังทำจริงๆ
-        print(step)
-    
-    print(f"\n✨ เสร็จเรียบร้อย! {menu['name']} ของคุณพร้อมเสิร์ฟแล้ว ✨")
-    
-    replay = input("\nอยากทำเมนูอื่นต่อไหม? (y/n): ")
-    if replay.lower() == 'y':
-        start_game()
-    else:
-        print("ขอบคุณที่มาเข้าครัวกับเราครับ!")
+        .ingredient-shelf {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
 
-# เริ่มต้นรันเกม
-if __name__ == "__main__":
-    start_game()
+        .ing-btn {
+            font-size: 2em;
+            background: #fff;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .ing-btn:active { transform: scale(0.9); }
+
+        .status {
+            font-size: 1.2em;
+            margin: 15px 0;
+            font-weight: bold;
+            color: #d84315;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #ddd;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #4CAF50;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .back-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #9E9E9E;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Animation */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(1); }
+        }
+        .pop-anim { animation: pop 0.3s ease; }
+
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <h1>ครัวไทยอีโมจิ 🇹🇭</h1>
+        <p>เลือกเมนูแล้วใส่วัตถุดิบให้ถูกต้อง!</p>
+
+        <div id="menu-selection">
+            <h3>📜 เลือกเมนูที่ต้องการทำ:</h3>
+            <div class="menu-grid">
+                <button class="menu-btn" onclick="startGame(0)">ผัดไทย<br>🍝</button>
+                <button class="menu-btn" onclick="startGame(1)">ต้มยำกุ้ง<br>🥘</button>
+                <button class="menu-btn" onclick="startGame(2)">ส้มตำ<br>🥗</button>
+                <button class="menu-btn" onclick="startGame(3)">แกงเขียวหวาน<br>🍲</button>
+                <button class="menu-btn" onclick="startGame(4)">ข้าวเหนียวมะม่วง<br>🥭</button>
+            </div>
+        </div>
+
+        <div id="kitchen">
+            <h2 id="dish-name">ชื่อเมนู</h2>
+            <div class="status" id="instruction">แตะที่วัตถุดิบเพื่อใส่ลงในหม้อ!</div>
+            
+            <div class="pot-area" id="pot">🍳</div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+
+            <div class="ingredient-shelf" id="shelf">
+                </div>
+
+            <button class="back-btn" onclick="resetGame()">⬅️ กลับไปหน้าเมนู</button>
+        </div>
+    </div>
+
+    <script>
+        // ข้อมูลสูตรอาหาร
+        const recipes = [
+            {
+                name: "ผัดไทย 🍝",
+                base: "🍳", // เริ่มต้นด้วยกระทะ
+                ingredients: ["🍜", "🦐", "🥚", "🥜", "🌱"], // เส้น, กุ้ง, ไข่, ถั่ว, ถั่วงอก
+                correctMsg: "ผัดไทยเส้นเหนียวนุ่มอร่อยมาก! 🎉"
+            },
+            {
+                name: "ต้มยำกุ้ง 🥘",
+                base: "🍲", // เริ่มต้นด้วยหม้อ
+                ingredients: ["🦐", "🌶️", "🍋", "🍄", "🧅"], // กุ้ง, พริก, มะนาว, เห็ด, หอม/ตะไคร้
+                correctMsg: "แซ่บจี๊ดถึงใจ! 🔥"
+            },
+            {
+                name: "ส้มตำ 🥗",
+                base: "🥣", // เริ่มต้นด้วยครก
+                ingredients: ["🥒", "🌶️", "🍅", "🥜", "🦀"], // มะละกอ(ใช้แตงกวาแทน), พริก, มะเขือเทศ, ถั่ว, ปู
+                correctMsg: "นัวมากแม่! 🌶️"
+            },
+            {
+                name: "แกงเขียวหวาน 🍲",
+                base: "🍲",
+                ingredients: ["🐔", "🥥", "🌶️", "🍆", "🌿"], // ไก่, กะทิ, พริกเขียว, มะเขือ, ใบโหระพา
+                correctMsg: "หอมกะทิสุดๆ! 😋"
+            },
+            {
+                name: "ข้าวเหนียวมะม่วง 🥭",
+                base: "🍛",
+                ingredients: ["🥭", "🍚", "🥥", "🧂", "🥜"], // มะม่วง, ข้าว, กะทิ, เกลือ, ถั่วทอง
+                correctMsg: "หวานมันชื่นใจ! 💖"
+            }
+        ];
+
+        // วัตถุดิบหลอก (Decoys)
+        const decoys = ["🍫", "🍕", "🍔", "🍟", "🍦", "🍩", "🥤", "🚗", "👟", "💊"];
+
+        let currentRecipe = null;
+        let foundCount = 0;
+        let isCooking = false;
+
+        function startGame(index) {
+            currentRecipe = recipes[index];
+            foundCount = 0;
+            isCooking = true;
+
+            // UI Setup
+            document.getElementById('menu-selection').style.display = 'none';
+            document.getElementById('kitchen').style.display = 'block';
+            document.getElementById('dish-name').innerText = "กำลังทำ: " + currentRecipe.name;
+            document.getElementById('pot').innerText = currentRecipe.base;
+            document.getElementById('instruction').innerText = "หาวัตถุดิบ " + currentRecipe.ingredients.length + " อย่าง!";
+            document.getElementById('instruction').style.color = "#d84315";
+            updateProgress();
+
+            // สร้างรายการวัตถุดิบ (จริง + หลอก)
+            let pool = [...currentRecipe.ingredients];
+            // สุ่มวัตถุดิบหลอกมาใส่ 5 อัน
+            for(let i=0; i<5; i++) {
+                pool.push(decoys[Math.floor(Math.random() * decoys.length)]);
+            }
+            // สลับตำแหน่ง (Shuffle)
+            pool.sort(() => Math.random() - 0.5);
+
+            // แสดงปุ่ม
+            const shelf = document.getElementById('shelf');
+            shelf.innerHTML = "";
+            pool.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = 'ing-btn';
+                btn.innerText = item;
+                btn.onclick = () => addIngredient(item, btn);
+                shelf.appendChild(btn);
+            });
+        }
+
+        function addIngredient(item, btn) {
+            if (!isCooking) return;
+
+            // ตรวจสอบว่าถูกไหม
+            if (currentRecipe.ingredients.includes(item)) {
+                // ถูกต้อง
+                btn.style.visibility = 'hidden'; // ซ่อนปุ่มที่กดแล้ว
+                foundCount++;
+                document.getElementById('pot').innerText = item; // โชว์ในหม้อแป๊บนึง
+                document.getElementById('pot').classList.remove('pop-anim');
+                void document.getElementById('pot').offsetWidth; // Trigger reflow
+                document.getElementById('pot').classList.add('pop-anim');
+
+                updateProgress();
+
+                if (foundCount === currentRecipe.ingredients.length) {
+                    finishGame(true);
+                }
+            } else {
+                // ผิด
+                document.getElementById('instruction').innerText = "อันนี้ไม่ใช่นะ! ลองใหม่ ❌";
+                btn.style.background = "#ffcdd2"; // สีแดงอ่อน
+                setTimeout(() => btn.style.background = "#fff", 500);
+            }
+        }
+
+        function updateProgress() {
+            const pct = (foundCount / currentRecipe.ingredients.length) * 100;
+            document.getElementById('progress').style.width = pct + "%";
+        }
+
+        function finishGame(win) {
+            isCooking = false;
+            document.getElementById('pot').innerText = currentRecipe.name.split(" ")[1] || "✅";
+            document.getElementById('instruction').innerText = currentRecipe.correctMsg;
+            document.getElementById('instruction').style.color = "#2E7D32";
+            
+            // Effect พลุ (Emoji Confetti แบบง่าย)
+            const shelf = document.getElementById('shelf');
+            shelf.innerHTML = "<h2>อร่อยมาก! ✨⭐⭐⭐⭐⭐✨</h2>";
+        }
+
+        function resetGame() {
+            document.getElementById('menu-selection').style.display = 'block';
+            document.getElementById('kitchen').style.display = 'none';
+        }
+
+    </script>
+</body>
+</html>
