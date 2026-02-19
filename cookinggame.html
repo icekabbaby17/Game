@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมทำอาหารไทย - Thai Cooking Game</title>
+    <style>
+        :root {
+            --pink-main: #ff85a2;
+            --pink-light: #ffb7c5;
+            --pink-dark: #f06292;
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #fff0f3;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #444;
+        }
+
+        #game-container {
+            width: 90%;
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            border: 5px solid var(--pink-main);
+        }
+
+        /* หน้าเมนูหลัก */
+        .screen { display: none; }
+        .active { display: block; }
+
+        h1 { color: var(--pink-dark); margin-bottom: 10px; }
+        .credit { font-size: 0.9em; margin-bottom: 20px; color: #777; }
+
+        .btn {
+            background-color: var(--pink-main);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .btn:hover { background-color: var(--pink-dark); transform: scale(1.05); }
+
+        /* หน้าเล่นเกม */
+        .status-bar { display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: bold; }
+        .customer { font-size: 4em; margin: 10px 0; }
+        .order-bubble {
+            background: #fdfdfd;
+            border: 2px dashed var(--pink-main);
+            padding: 10px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .ingredient-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .ingredient {
+            font-size: 2em;
+            padding: 10px;
+            background: #fff5f7;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .ingredient:active { transform: scale(0.9); }
+
+        .pot {
+            margin: 20px auto;
+            width: 100px;
+            height: 100px;
+            line-height: 100px;
+            font-size: 3em;
+            border-bottom: 5px solid #555;
+            border-radius: 0 0 20px 20px;
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="start-screen" class="screen active">
+        <h1>🍳 ครัวไทยสีชมพู</h1>
+        <div class="credit">
+            จัดทำโดย: ด.ญ. ธัญรัตน์ ปันหอม<br>
+            ชั้น ม.2/2 เลขที่ 19
+        </div>
+        <button class="btn" onclick="startGame()">เข้าสู่เกม</button>
+    </div>
+
+    <div id="game-screen" class="screen">
+        <div class="status-bar">
+            <span>❤️ ผิดได้อีก: <span id="lives">3</span></span>
+            <span>⭐ คะแนน: <span id="score">0</span></span>
+        </div>
+        
+        <div id="customer-area">
+            <div class="customer" id="customer-emoji">👤</div>
+            <div class="order-bubble">
+                ลูกค้าอยากทาน: <strong id="target-menu">...</strong>
+            </div>
+        </div>
+
+        <div class="pot" id="pot">🥘</div>
+        <p>คลิกเลือกวัตถุดิบ 2 อย่างให้ถูกต้อง!</p>
+
+        <div class="ingredient-grid" id="ingredients-pool">
+            </div>
+    </div>
+
+    <div id="end-screen" class="screen">
+        <h1>จบเกม!</h1>
+        <p id="final-stats"></p>
+        <button class="btn" onclick="location.reload()">เล่นใหม่อีกครั้ง</button>
+    </div>
+</div>
+
+<script>
+    // ข้อมูลเมนู 17 อย่าง และวัตถุดิบหลัก 2 อย่างต่อเมนู
+    const recipes = [
+        { name: "ต้มยำกุ้ง", ingredients: ["🦐", "🍋"], stars: 3 },
+        { name: "ผัดไทย", ingredients: ["🍝", "🥜"], stars: 3 },
+        { name: "ส้มตำ", ingredients: ["🥗", "🌶️"], stars: 2 },
+        { name: "แกงเขียวหวาน", ingredients: ["🥥", "🍗"], stars: 3 },
+        { name: "ข้าวมันไก่", ingredients: ["🍚", "🍗"], stars: 2 },
+        { name: "กะเพราไข่ดาว", ingredients: ["🌿", "🍳"], stars: 2 },
+        { name: "ข้าวผัด", ingredients: ["🍚", "🥚"], stars: 1 },
+        { name: "ต้มข่าไก่", ingredients: ["🥥", "🍄"], stars: 3 },
+        { name: "แกงมัสมั่น", ingredients: ["🥜", "🥩"], stars: 3 },
+        { name: "ผัดซีอิ๊ว", ingredients: ["🍝", "🥦"], stars: 2 },
+        { name: "น้ำตกหมู", ingredients: ["🥩", "🌿"], stars: 2 },
+        { name: "แกงเผ็ด", ingredients: ["🌶️", "🥩"], stars: 3 },
+        { name: "ห่อหมก", ingredients: ["🐟", "🥥"], stars: 3 },
+        { name: "ไข่เจียว", ingredients: ["🥚", "🧅"], stars: 1 },
+        { name: "ลาบหมู", ingredients: ["🐷", "🌿"], stars: 2 },
+        { name: "ยำวุ้นเส้น", ingredients: ["🥗", "🦐"], stars: 2 },
+        { name: "ข้าวเหนียวมะม่วง", ingredients: ["🍚", "🥭"], stars: 3 }
+    ];
+
+    const distractors = ["🍫", "🍦", "🍕", "🍔", "🍟", "🍩"]; // วัตถุดิบหลอก
+    const customers = ["👨‍🦰", "👩‍🦱", "👵", "🧔", "👧", "👱‍♂️"];
+
+    let currentRecipe = {};
+    let selectedIngredients = [];
+    let lives = 3;
+    let score = 0;
+
+    function startGame() {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('game-screen').classList.add('active');
+        nextOrder();
+    }
+
+    function nextOrder() {
+        selectedIngredients = [];
+        document.getElementById('pot').innerHTML = "🥘";
+        
+        // สุ่มลูกค้าและเมนู
+        currentRecipe = recipes[Math.floor(Math.random() * recipes.length)];
+        const customer = customers[Math.floor(Math.random() * customers.length)];
+        
+        document.getElementById('customer-emoji').innerText = customer;
+        document.getElementById('target-menu').innerText = currentRecipe.name;
+        
+        renderIngredients();
+    }
+
+    function renderIngredients() {
+        const pool = document.getElementById('ingredients-pool');
+        pool.innerHTML = '';
+        
+        // รวมวัตถุดิบจริง + ตัวหลอก
+        let items = [...currentRecipe.ingredients, ...distractors].sort(() => Math.random() - 0.5);
+        
+        items.forEach(emoji => {
+            const div = document.createElement('div');
+            div.className = 'ingredient';
+            div.innerText = emoji;
+            div.onclick = () => selectIngredient(emoji);
+            pool.appendChild(div);
+        });
+    }
+
+    function selectIngredient(emoji) {
+        if (selectedIngredients.length < 2) {
+            selectedIngredients.push(emoji);
+            document.getElementById('pot').innerText = emoji;
+            
+            if (selectedIngredients.length === 2) {
+                checkRecipe();
+            }
+        }
+    }
+
+    function checkRecipe() {
+        const isCorrect = currentRecipe.ingredients.every(ing => selectedIngredients.includes(ing));
+
+        if (isCorrect) {
+            score += currentRecipe.stars;
+            alert(`เก่งมาก! รับไป ${currentRecipe.stars} ดาว ⭐`);
+        } else {
+            lives--;
+            alert(`ว้า เลือกวัตถุดิบผิด!`);
+        }
+
+        updateUI();
+
+        if (lives <= 0) {
+            endGame();
+        } else {
+            nextOrder();
+        }
+    }
+
+    function updateUI() {
+        document.getElementById('score').innerText = score;
+        document.getElementById('lives').innerText = lives;
+    }
+
+    function endGame() {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('end-screen').classList.add('active');
+        document.getElementById('final-stats').innerHTML = `
+            คุณทำคะแนนได้: ${score} ดาว ⭐<br>
+            ขอบคุณที่ร่วมสนุกกับครัวของ ธัญรัตน์!
+        `;
+    }
+</script>
+
+</body>
+</html>
